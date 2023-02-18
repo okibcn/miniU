@@ -1,0 +1,133 @@
+# Copyright (c) 2023 okibcn
+# This is free software, licensed under the GNU General Public License v3.0
+# See /LICENSE for more information.
+# https://github.com/okibcn/nano-for-windows
+# Description: Builds nano for Windows
+
+name: "Build Ubi"
+on:
+  workflow_dispatch:
+      inputs:
+        debug_enabled:
+          description: 'Debug session enabled'
+          required: false
+          default: false
+          type: boolean
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: "⏬ Checkout repository"
+      uses: actions/checkout@v3
+    - name: "📝 Generate image"
+      run: |
+        ## actual work
+        sudo apt install -y qemu-utils # libguestfs-tools 
+        7z e vhdx.7z
+        cd ~
+        docker run --name ubi ubuntu ls
+        docker start ubi
+        containerID=$(docker ps | grep ubi | awk '{print $1}')
+
+        ## To enter interactively into the running container
+        # docker exec -it $containerID /bin/bash
+
+        docker export $containerID > $GITHUB_WORKSPACE/base_tarball.tar
+
+        git clone https://github.com/StoneyDSP/ubento.git
+        cd ubento
+        docker cp etc $containerID:/
+        docker cp root $containerID:/
+
+        docker export $containerID > $GITHUB_WORKSPACE/ubi.tar
+        cd $GITHUB_WORKSPACE
+        ls -als
+
+        # ## Create drive
+        # cd
+        # truncate -s 1G my.img
+
+        # ## Create filesystem
+        # mkfs.ext4 my.img
+
+        # ## mount
+        # sudo mkdir -p /mnt/img
+        # sudo mount -oloop my.img /mnt/img
+
+        # ## insert OS structure
+        # cd /mnt/img
+        # sudo tar xf $GITHUB_WORKSPACE/ubi.tar -C .
+        # cd
+        # ## unmount
+        # sudo umount /mnt/img
+
+        # ## reduce image size
+        # sudo e2fsck -a -f my.img
+        # sudo resize2fs -M my.img
+
+
+        # # qemu-img convert my.img -O vhdx -o subformat=dynamic $GITHUB_WORKSPACE/img.vhdx
+
+        # ## create empty VHDX drive
+        # # qemu-img create -f vhdx $GITHUB_WORKSPACE/ubi.vhdx 1024G
+
+        # sudo modprobe nbd                                                # Create block device
+        # sudo qemu-nbd -f vhdx -c /dev/nbd0 $GITHUB_WORKSPACE/win.vhdx    # Attach to block device
+        # sudo dd if=my.img of=/dev/nbd0                                   # copy image to VHDX drive
+        # sudo resize2fs /dev/nbd0                                         # Resize partition to fit 1TB drive
+        # sudo qemu-nbd -d /dev/nbd0                                       # diconnect vhdx file from device
+
+        cd $GITHUB_WORKSPACE
+        7z a images.7z  *.tar *.vhdx
+
+
+
+    - name: "🔧 Prepare debug session"
+      if: github.event.inputs.debug_enabled == 'true'
+      run: |
+        # install zsh
+        sudo apt install zsh zsh-syntax-highlighting
+
+        # oh-my-posh
+        sudo wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O /usr/local/bin/oh-my-posh
+        sudo chmod +x /usr/local/bin/oh-my-posh
+
+        # oh-my-posh Themes
+        mkdir ~/.poshthemes
+        wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/themes.zip -O ~/.poshthemes/themes.zip
+        unzip ~/.poshthemes/themes.zip -d ~/.poshthemes
+        chmod u+rw ~/.poshthemes/*.omp.*
+        rm ~/.poshthemes/themes.zip
+
+        # setting rc files
+        echo "eval \"\$(oh-my-posh init \$(oh-my-posh get shell))\"" >> ~/.bashrc
+        echo "eval \"\$(oh-my-posh init \$(oh-my-posh get shell))\"" >> ~/.zshrc
+
+        cp .nanorc.linux ~/.nanorc
+        cp Github_Linux/profile.sh ~/.bashrc
+        echo "source ~/.bashrc" >> ~/.bash_profile
+        cp Github_Linux/profile.sh ~/.zshrc
+
+
+
+
+    - name: "🐞 Debug session"
+      uses: mxschmitt/action-tmate@v3
+      if: github.event.inputs.debug_enabled == 'true'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ## More info at https://til.simonwillison.net/github-actions/debug-tmate
+        ##           or https://github.com/mxschmitt/action-tmate
+
+
+
+    - name: "👍 Upload Artifact"
+      uses: actions/upload-artifact@v3
+      with:
+        name: Latest_Ubi
+        path: |
+          images.7z

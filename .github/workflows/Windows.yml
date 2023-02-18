@@ -1,0 +1,25 @@
+# Copyright (c) 2023 okibcn
+# This is free software, licensed under the GNU General Public License v3.0
+# See /LICENSE for more information.
+# https://github.com/okibcn/nano-for-windows
+# Description: Builds nano for Windows
+
+name: "Windows Runner Shell"
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+    - name: "⏬ Checkout repository"
+      uses: actions/checkout@v3
+    - name: "🐞 Debug session"
+      uses: mxschmitt/action-tmate@v3
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ## More info at https://til.simonwillison.net/github-actions/debug-tmate
+        ##           or https://github.com/mxschmitt/action-tmate
