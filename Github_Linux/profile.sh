@@ -111,7 +111,9 @@ fin() {
   [ -z "$2" ] && grep -rnw * -e "$1" || grep -rnw "$1" -e "$2"
 }
 
-safepath() { echo $PATH | sed -e 's,/mnt[^:]*,,g' | sed -r 's/:+/:/g' }
+safepath() { 
+    echo $PATH | sed -e 's,/mnt[^:]*,,g' | sed -r 's/:+/:/g'
+}
 
 export SAFEPATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export UPX="--lzma --best"
