@@ -16,6 +16,6 @@ rm ~/.poshthemes/themes.zip
 echo "eval \"\$(oh-my-posh init \$(oh-my-posh get shell))\"" >> ~/.bashrc
 echo "eval \"\$(oh-my-posh init \$(oh-my-posh get shell))\"" >> ~/.zshrc
 
-cp Github_linux/.nanorc    ~/.nanorc
-cp Github_linux/profile.sh ~/.bashrc
-cp Github_linux/profile.sh ~/.zshrc
+cp Github_Linux/.nanorc    ~/.nanorc
+cp Github_Linux/profile.sh ~/.bashrc
+cp Github_Linux/profile.sh ~/.zshrc
