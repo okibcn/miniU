@@ -4,7 +4,7 @@
 # https://github.com/okibcn/nano-for-windows
 # Description: Builds nano for Windows
 
-name: "Build Ubi"
+name: "Build miniU"
 on:
   workflow_dispatch:
       inputs:
@@ -29,21 +29,15 @@ jobs:
         sudo apt install -y qemu-utils # libguestfs-tools 
         7z e vhdx.7z
         cd ~
-        docker run --name ubi ubuntu ls
-        docker start ubi
-        containerID=$(docker ps | grep ubi | awk '{print $1}')
-
-        ## To enter interactively into the running container
-        # docker exec -it $containerID /bin/bash
-
-        docker export $containerID > $GITHUB_WORKSPACE/base_tarball.tar
+        docker run -d --name miniu ubuntu ls
+        docker export miniu > $GITHUB_WORKSPACE/base_tarball.tar
 
         git clone https://github.com/StoneyDSP/ubento.git
         cd ubento
-        docker cp etc $containerID:/
-        docker cp root $containerID:/
+        docker cp etc miniu:/
+        docker cp root miniu:/
 
-        docker export $containerID > $GITHUB_WORKSPACE/ubi.tar
+        docker export miniu > $GITHUB_WORKSPACE/miniu.tar
         cd $GITHUB_WORKSPACE
         ls -als
 

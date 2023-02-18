@@ -4,7 +4,7 @@
 # https://github.com/okibcn/nano-for-windows
 # Description: Builds nano for Windows
 
-name: Ubuntu Runner Shell
+name: Ubuntu
 on:
   workflow_dispatch:
     inputs:
