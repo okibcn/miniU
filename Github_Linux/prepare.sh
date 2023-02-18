@@ -12,12 +12,10 @@ unzip ~/.poshthemes/themes.zip -d ~/.poshthemes
 chmod u+rw ~/.poshthemes/*.omp.*
 rm ~/.poshthemes/themes.zip
 
-
-
 # place this in .bashrc or .zshrc
 echo "eval \"\$(oh-my-posh init \$(oh-my-posh get shell))\"" >> ~/.bashrc
 echo "eval \"\$(oh-my-posh init \$(oh-my-posh get shell))\"" >> ~/.zshrc
 
-cp .nanorc.linux ~/.nanorc
+cp Github_linux/.nanorc    ~/.nanorc
 cp Github_linux/profile.sh ~/.bashrc
 cp Github_linux/profile.sh ~/.zshrc

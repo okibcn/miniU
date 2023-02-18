@@ -44,7 +44,7 @@ jobs:
         echo "eval \"\$(oh-my-posh init \$(oh-my-posh get shell))\"" >> ~/.zshrc
 
         ## Default profiles
-        cp .nanorc.linux ~/.nanorc
+        cp Github_linux/.nanorc ~/.nanorc
         cp /etc/bash.bashrc ~
         cat Github_Linux/profile.sh >> ~/bash.bashrc
         sudo cp ~/bash.bashrc /etc/bash.bashrc -f
