@@ -46,7 +46,9 @@ jobs:
         ## Default profiles
         cp Github_Linux/.nanorc ~/.nanorc
         cp /etc/bash.bashrc ~
+        echo "" >>  ~/bash.bashrc
         cat Github_Linux/profile.sh >> ~/bash.bashrc
+        echo "" >>  ~/bash.bashrc
         sudo cp ~/bash.bashrc /etc/bash.bashrc -f
         cp Github_Linux/profile.sh ~/.zshrc
 
