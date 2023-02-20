@@ -81,3 +81,10 @@ function dirs {
         Get-ChildItem -Recurse | Foreach-Object FullName
     }
 }
+# function docker { wsl -d docker docker $args }
+# function dockersize { wsl -d docker du -hd 1 /var/lib/docker/ }
+# function dockerclean { 
+#     docker stop $(docker ps -a -q) -t 0
+#     docker image ls -a
+#     docker system prune -a 
+# }

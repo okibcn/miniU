@@ -1,4 +1,4 @@
-sudo apt install -y pv libguestfs-tools qemu-utils
+sudo apt install -y pv qemu-utils
 
 cd ~
 ## start a new container and keep it running interactive (-it) but detached (-d) with bash
@@ -56,7 +56,7 @@ qemu-img convert my.img -O vhdx -o subformat=dynamic img.vhdx
 
 
 
-## mount WSL VHDX in linux
+## mount WSL VHDX in linux using guestmount 
 sudo mkdir -p /mnt/wsl
 sudo guestmount -o allow_other --add ubi.vhdx --rw /mnt/wsl -m /dev/sda
 sudo guestunmount /mnt/wsl
@@ -66,9 +66,30 @@ sudo guestfish --rw -a myvhdxfile.vhdx
 # list-filesystems
 # exit
 
-qemu-img create -f vhdx ubi.vhdx 1024G
 
+qemu-img create -f vhdx ubi.vhdx 1024G
 sudo modprobe nbd
 sudo qemu-nbd -f vhdx -c /dev/nbd0 ubi.vhdx
 sudo dd if=my.img of=/dev/nbd0
 sudo qemu-nbd -d /dev/nbd0
+
+
+
+
+
+## DOCKER WSL IMAGE
+apt update -y
+apt install -y wget apt-utils
+sh -c "$(wget -qO- https://raw.githubusercontent.com/docker/docker-install/master/install.sh)"
+echo "[boot]" >> /etc/wsl.conf
+echo "command = service docker start" >> /etc/wsl.conf
+
+
+## QEMU IMAGE MOUNT
+apt install -y qemu-utils
+qemu-img create -f qcow2 -o compression_type=zstd vimage 1T
+modprobe nbd
+sudo qemu-nbd --discard=on --detect-zeroes=on -c /dev/nbd0 vimage
+mkfs.ext4 /dev/nbd0
+mkdir -p /mnt/dkr
+mount /dev/nbd0 /mnt/dkr

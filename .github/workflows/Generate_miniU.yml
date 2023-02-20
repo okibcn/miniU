@@ -23,61 +23,42 @@ jobs:
     steps:
     - name: "⏬ Checkout repository"
       uses: actions/checkout@v3
-    - name: "📝 Generate image"
+    - name: "📝 Generate miniU-0"
       run: |
-        ## actual work
-        sudo apt install -y qemu-utils # libguestfs-tools 
-        7z e vhdx.7z
-        cd ~
-        docker run -d --name miniu ubuntu ls
-        docker export miniu > $GITHUB_WORKSPACE/base_tarball.tar
+        ##----------------   GENERATE miniU-0   ---------------##
+        #
+        docker run -dit --name miniu ubuntu bash
+        docker export miniu > miniU-raw.tar
 
+
+    - name: "📝 Generate miniU-docker"
+      run: |
+        ##----------------   GENERATE miniU-docker  ---------------##
+        #
+        alias EXE='docker exec miniu'
+        EXE apt update -y
+        EXE apt install -y wget apt-utils nano
+        EXE wget -q https://raw.githubusercontent.com/docker/docker-install/master/install.sh
+        EXE chmod +x install.sh
+        EXE /docker install.sh
+        EXE sh -c "echo \"[boot]\" >> /etc/wsl.conf"
+        EXE sh -c "echo \"command = service docker start\" >> /etc/wsl.conf"
+        EXE apt clean
+        docker stop miniu -t 0
+        docker export miniu > miniU-docker.tar
+
+
+    - name: "📝 Generate miniU"
+      run: |
+        ##----------------   GENERATE miniU   ---------------##
+        #
+
+        docker container prune -f
+        docker run -dit --name miniu ubuntu bash
         git clone https://github.com/StoneyDSP/ubento.git
         cd ubento
         docker cp etc miniu:/
         docker cp root miniu:/
-
-        docker export miniu > $GITHUB_WORKSPACE/miniu.tar
-        cd $GITHUB_WORKSPACE
-        ls -als
-
-        # ## Create drive
-        # cd
-        # truncate -s 1G my.img
-
-        # ## Create filesystem
-        # mkfs.ext4 my.img
-
-        # ## mount
-        # sudo mkdir -p /mnt/img
-        # sudo mount -oloop my.img /mnt/img
-
-        # ## insert OS structure
-        # cd /mnt/img
-        # sudo tar xf $GITHUB_WORKSPACE/ubi.tar -C .
-        # cd
-        # ## unmount
-        # sudo umount /mnt/img
-
-        # ## reduce image size
-        # sudo e2fsck -a -f my.img
-        # sudo resize2fs -M my.img
-
-
-        # # qemu-img convert my.img -O vhdx -o subformat=dynamic $GITHUB_WORKSPACE/img.vhdx
-
-        # ## create empty VHDX drive
-        # # qemu-img create -f vhdx $GITHUB_WORKSPACE/ubi.vhdx 1024G
-
-        # sudo modprobe nbd                                                # Create block device
-        # sudo qemu-nbd -f vhdx -c /dev/nbd0 $GITHUB_WORKSPACE/win.vhdx    # Attach to block device
-        # sudo dd if=my.img of=/dev/nbd0                                   # copy image to VHDX drive
-        # sudo resize2fs /dev/nbd0                                         # Resize partition to fit 1TB drive
-        # sudo qemu-nbd -d /dev/nbd0                                       # diconnect vhdx file from device
-
-        cd $GITHUB_WORKSPACE
-        7z a images.7z  *.tar *.vhdx
-
 
 
     - name: "🔧 Prepare debug session"
