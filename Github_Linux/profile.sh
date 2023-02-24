@@ -63,7 +63,7 @@ ver () {
   echo -e "Kernel:\t\t"`uname -o` `uname -r`
   echo -e "Kernel date:\t"`uname -v`
   echo -e "Timestamp:\t"`date +"%Y.%m.%d - %T %Z"`
-  echo -e "Uptime:\t\t"`uptime -p | cut -c4-`
+  echo -e "Uptime:\t\t"`uptime | grep -Eo '^[^,]+' | sed 's/^ *//'`
   echo -e "Hostname:\t"`cat /etc/hostname`
   echo -e "Active User:\t"`whoami`
   echo -e "--------------------------Network Information------------------------"

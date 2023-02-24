@@ -88,7 +88,7 @@ echo "command = service docker start" >> /etc/wsl.conf
 ## QEMU IMAGE MOUNT
 apt install -y qemu-utils
 qemu-img create -f qcow2 -o compression_type=zstd vimage 1T
-modprobe nbd
+sudo 
 sudo qemu-nbd --discard=on --detect-zeroes=on -c /dev/nbd0 vimage
 mkfs.ext4 /dev/nbd0
 mkdir -p /mnt/dkr
