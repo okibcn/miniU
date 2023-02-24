@@ -69,7 +69,7 @@ ver () {
   echo -e "--------------------------Network Information------------------------"
   echo -e "MAC:\t\t"`ip -br link | awk '/UP / {print $1" "$3}'`
   echo -e "System IP:\t"`ip -br a | awk '/UP/ {print $1" "$3" "$4}'`
-  echo -e "Public IP:\t"`curl -s ipinfo.io/ip`
+  echo -e "Public IP:\t"`wget -qO- ipinfo.io/ip`
   echo -e "Gateway:\t"`ip neighbor | awk '{print $1}'`
   echo -e "---------------------------CPU/Memory Usage--------------------------"
   echo -e "Memory Usage:\t"`free | awk '/Mem/{printf("%.2f%"), $3/$2*100}'`"\t"`free -h | awk '/Mem/ {print $3}'`
